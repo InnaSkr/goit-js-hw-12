@@ -2,26 +2,33 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Image Search App</title>
+    <title>Gallery</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/modern-normalize/3.0.1/modern-normalize.min.css"
+      integrity="sha512-q6WgHqiHlKyOqslT/lgBgodhd03Wp4BEqKeW6nNtlOY4quzyG3VoQKFrieaCeSnuVseNKRGpGeDU3qPmabCANg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
     <link rel="stylesheet" href="./css/styles.css" />
   </head>
   <body>
-    <form id="search-form">
+    <form class="form">
       <input
         type="text"
-        name="searchQuery"
+        class="enter-img"
         placeholder="Search images..."
-        required
+        name="input"
       />
-      <button type="submit">Search</button>
+      <button class="submit">Search</button>
     </form>
-
-    <div class="gallery"></div>
-    <button class="load-more" style="display: none">Load more</button>
-    <div class="loader" style="display: none">Loading...</div>
-
+    <p class="message"></p>
+    <ul class="gallery container"></ul>
+    <button class="more hidden">Load more...</button>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script type="module" src="./main.js"></script>
   </body>
 </html>

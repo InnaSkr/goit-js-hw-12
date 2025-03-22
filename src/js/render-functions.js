@@ -1,28 +1,35 @@
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 
-const gallery = document.querySelector('.gallery');
-let lightbox = new SimpleLightbox('.gallery a');
+const ulGallery = document.querySelector('.gallery');
 
-export function renderImages(images) {
-    const markup = images.map(image => `
-        <a href="${image.largeImageURL}" class="gallery-item">
-            <img src="${image.webformatURL}" alt="${image.tags}" title="Likes: ${image.likes}, Views: ${image.views}, Comments: ${image.comments}, Downloads: ${image.downloads}"/>
-        </a>
-    `).join('');
+export function make(imagesArr) {
+  const photos = imagesArr
+    .map(image => {
+      return `
+        <li class="gallery-item">
+            <a class='gallery-link' href="${image.largeImageURL}">
+              <img class="li-img"
+              src="${image.webformatURL}" 
+              alt="${image.tags}/> 
+              <div class="li-text">
+                <table class="table">
+                    <tr><td>Likes</td><td>Views</td><td>Comment</td><td>Downloads</tr>
+                    <tr><td>>${image.likes}</td><td>${image.views}</td><td>${image.comments}</td><td>${image.downloads}</tr>
+                </table>   
+                </div>
+              </a>
+            </li>
+        `;
+    })
+    .join('');
 
-    gallery.insertAdjacentHTML('beforeend', markup);
-    lightbox.refresh();
+  ulGallery.insertAdjacentHTML('beforeend', photos);
+
+  lightbox.refresh();
 }
 
-export function clearGallery() {
-    gallery.innerHTML = '';
-}
-
-export function smoothScroll() {
-    const { height } = gallery.firstElementChild.getBoundingClientRect();
-    window.scrollBy({
-        top: height * 2,
-        behavior: 'smooth',
-    });
-}
+const lightbox = new SimpleLightbox('.gallery' + ' a', {
+  captionsData: 'alt',
+  captionDelay: 250,
+});
