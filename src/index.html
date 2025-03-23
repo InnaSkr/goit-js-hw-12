@@ -1,34 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Gallery</title>
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/modern-normalize/3.0.1/modern-normalize.min.css"
-      integrity="sha512-q6WgHqiHlKyOqslT/lgBgodhd03Wp4BEqKeW6nNtlOY4quzyG3VoQKFrieaCeSnuVseNKRGpGeDU3qPmabCANg=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    />
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+        <link rel="stylesheet" href="./css/styles.css" />
+    </head>
+    <body>
+        <form class="form">
+            <input type="text" class="user-input" placeholder="Search images..." />
+            <button class="submit-button" type="submit">Search</button>
+        </form>
 
-    <link rel="stylesheet" href="./css/styles.css" />
-  </head>
-  <body>
-    <form class="form">
-      <input
-        type="text"
-        class="enter-img"
-        placeholder="Search images..."
-        name="input"
-      />
-      <button class="submit">Search</button>
-    </form>
-    <p class="message"></p>
-    <ul class="gallery container"></ul>
-    <button class="more hidden">Load more...</button>
-    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-    <script type="module" src="./main.js"></script>
-  </body>
+        <ul class="gallery"></ul>
+
+        <div class="load-message-box"></div>
+        <button class="submit-button load-more-button hide" type="button">Load more</button>
+
+        <script type="module" src="./main.js"></script>
+    </body>
 </html>
