@@ -1,61 +1,144 @@
-import { getImage, resetPage, addPage, ifEndOfList } from './js/pixabay-api';
-import { galleryMarkup, addLoadStroke, removeLoadStroke } from './js/render-functions';
+import axios from 'axios';
 import iziToast from 'izitoast';
 import 'izitoast/dist/css/iziToast.min.css';
+import SimpleLightbox from 'simplelightbox';
+import 'simplelightbox/dist/simple-lightbox.min.css';
 
-const form = document.querySelector('.form');
-const gallery = document.querySelector('.gallery');
-const loadMessageBox = document.querySelector('.load-message-box');
-const loadMoreButton = document.querySelector('.load-more-button');
+import { fetchPixabay, PAGE_SIZE } from './js/pixabay-api';
+import { populateGallery, clearGallery } from './js/render-functions';
+let currentPage = 1;
+let searchQuery = '';
+const pixabayRefs = {
+  form: document.querySelector('.form'),
+  searchQueryInput: document.querySelector('.form-input'),
+  imagesContainer: document.querySelector('.gallery'),
+  button: document.querySelector('.form-button'),
+  loader: document.querySelector('.loader'),
+  buttomLoadMore: document.querySelector('.add-posts-button'),
+};
 
-form.addEventListener('submit', handleSubmit);
-loadMoreButton.addEventListener('click', loadMoreClick);
+pixabayRefs.form.addEventListener('submit', async event => {
+  event.preventDefault();
+  searchQuery = pixabayRefs.searchQueryInput.value.trim();
+  currentPage = 1;
+  const container = document.querySelector('.gallery');
+  container.innerHTML = '';
+  if (!searchQuery) {
+    iziToast.error({
+      messageColor: '#FAFAFB',
+      iconUrl: './img/bi_x-octagon.svg',
+      iconColor: 'white',
+      message: 'Please enter a search word!',
+      position: 'topRight',
+      backgroundColor: '#ef4040',
+      color: '#fafafb',
+    });
+    return;
+  }
+  // clearGallery();
 
-function handleSubmit(event) {
-    event.preventDefault();
+  pixabayRefs.loader.style.display = 'inline-block';
 
-    const inputValue = document.querySelector('.user-input').value.trim();
+  try {
+    const response = await fetchPixabay(searchQuery);
+    const totalPages = Math.ceil(response.totalHits / PAGE_SIZE);
 
-    if (inputValue === '') {
-        return;
+    if (response.hits.length === 0) {
+      iziToast.error({
+        messageColor: '#FAFAFB',
+        iconUrl: './img/bi_x-octagon.svg',
+        iconColor: 'white',
+        message:
+          'Sorry, there are no images matching</br> your search query. Please, try again!',
+        position: 'topRight',
+        backgroundColor: '#ef4040',
+        color: '#fafafb',
+      });
+      pixabayRefs.buttomLoadMore.style.display = 'none';
+      return;
     }
 
-    gallery.innerHTML = '';
-    addLoadStroke(loadMessageBox);
-    loadMoreButton.classList.add('hide');
-    resetPage();
+    if (totalPages > currentPage) {
+      pixabayRefs.buttomLoadMore.style.display = 'flex';
+    } else {
+      pixabayRefs.buttomLoadMore.style.display = 'none';
+      iziToast.error({
+        messageColor: '#FAFAFB',
+        iconUrl: './img/bi_x-octagon.svg',
+        iconColor: 'white',
+        message:
+          'We are sorry, but you have reached the end of search results.',
+        position: 'topRight',
+        backgroundColor: '#4e75ff',
+        color: '#fafafb',
+      });
+    }
 
-    doTheWork(inputValue);
-}
+    populateGallery(response.hits);
+    console.log(response);
+  } catch (error) {
+    iziToast.error({
+      messageColor: '#FAFAFB',
+      iconUrl: './img/bi_x-octagon.svg',
+      iconColor: 'white',
+      message:
+        'Sorry, there are no images matching</br> your search query. Please, try again!',
+      position: 'topRight',
+      backgroundColor: '#ef4040',
+      color: '#fafafb',
+    });
+  } finally {
+    pixabayRefs.loader.style.display = 'none';
+  }
+});
 
-function loadMoreClick(event) {
-    const inputValue = document.querySelector('.user-input').value.trim();
-    addPage();
-    addLoadStroke(loadMessageBox);
-    doTheWork(inputValue);
-}
+pixabayRefs.buttomLoadMore.addEventListener('click', async event => {
+  event.preventDefault();
+  searchQuery = pixabayRefs.searchQueryInput.value.trim();
+  currentPage++;
 
-function doTheWork(inputValue) {
-    getImage(inputValue)
-        .then(response => {
-            galleryMarkup(response);
-            removeLoadStroke(loadMessageBox);
-            loadMoreButton.classList.remove('hide');
-            ifEndOfList(response, loadMessageBox);
-        })
-        .catch(error => {
-            iziToast.show({
-                messageColor: '#FAFAFB',
-                messageSize: '16px',
-                backgroundColor: '#EF4040',
-                iconUrl: errorIcon,
-                transitionIn: 'bounceInLeft',
-                position: 'topRight',
-                displayMode: 'replace',
-                closeOnClick: true,
-                message: 'Something went wrong. Please, try again.',
-            });
-            console.log(error);
-            removeLoadStroke(loadMessageBox);
-        });
-}
+  try {
+    const response = await fetchPixabay(searchQuery, currentPage);
+
+    populateGallery(response.hits);
+    console.log(response);
+
+    const card = document
+      .querySelector('.card-container')
+      .getBoundingClientRect().height;
+
+    window.scrollBy({
+      top: card * 2,
+      behavior: 'smooth',
+    });
+
+    pixabayRefs.buttomLoadMore.style.display = 'flex';
+
+    if (Math.ceil(response.totalHits / PAGE_SIZE) > currentPage) {
+      pixabayRefs.buttomLoadMore.style.display = 'flex';
+    } else {
+      pixabayRefs.buttomLoadMore.style.display = 'none';
+      iziToast.error({
+        messageColor: '#FAFAFB',
+        iconUrl: './img/bi_x-octagon.svg',
+        iconColor: 'white',
+        message:
+          'We are sorry, but you have reached the end of search results.',
+        position: 'topRight',
+        backgroundColor: '#4e75ff',
+        color: '#fafafb',
+      });
+    }
+  } catch (error) {
+    iziToast.error({
+      messageColor: '#FAFAFB',
+      iconUrl: './img/bi_x-octagon.svg',
+      iconColor: 'white',
+      message:
+        'Sorry, there are no images matching</br> your search query. Please, try again!',
+      position: 'topRight',
+      backgroundColor: '#ef4040',
+      color: '#fafafb',
+    });
+  }
+});
